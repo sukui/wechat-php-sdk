@@ -14,7 +14,6 @@
 
 namespace Wechat\Lib;
 
-use Prpcrypt;
 use Wechat\Loader;
 
 /**
@@ -104,20 +103,20 @@ class Common
     public function valid()
     {
         $encryptStr = "";
-        if ($_SERVER['REQUEST_METHOD'] == "POST") {
-            $postStr = file_get_contents("php://input");
+        $method = yield requestMethod();
+        if ($method == "POST") {
+            $postStr = yield requestContent();
             $array = (array)simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
-            $this->encrypt_type = isset($_GET["encrypt_type"]) ? $_GET["encrypt_type"] : '';
+            $this->encrypt_type = yield requestGet('encrypt_type');
             if ($this->encrypt_type == 'aes') {
                 $encryptStr = $array['Encrypt'];
-                !class_exists('Prpcrypt', false) && require __DIR__ . '/Prpcrypt.php';
                 $pc = new Prpcrypt($this->encodingAesKey);
                 $array = $pc->decrypt($encryptStr, $this->appid);
                 if (!isset($array[0]) || intval($array[0]) > 0) {
                     $this->errCode = $array[0];
                     $this->errMsg = $array[1];
-                    Tools::log("Interface Authentication Failed. {$this->errMsg}[{$this->errCode}]", "ERR - {$this->appid}");
-                    return false;
+                    yield Tools::log("Interface Authentication Failed. {$this->errMsg}[{$this->errCode}]-{$this->appid}");
+                    yield false;
                 }
                 $this->postxml = $array[1];
                 empty($this->appid) && $this->appid = $array[2];
@@ -125,17 +124,17 @@ class Common
                 $this->postxml = $postStr;
             }
         } elseif (isset($_GET["echostr"])) {
-            if ($this->checkSignature()) {
-                @ob_clean();
-                exit($_GET["echostr"]);
+            if (yield $this->checkSignature()) {
+                yield true;
             }
-            return false;
+            yield false;
         }
-        if (!$this->checkSignature($encryptStr)) {
+        $ret = yield $this->checkSignature($encryptStr);
+        if (!$ret) {
             $this->errMsg = 'Interface authentication failed, please use the correct method to call.';
-            return false;
+            yield false;
         }
-        return true;
+        yield true;
     }
 
     /**
@@ -145,15 +144,16 @@ class Common
      */
     private function checkSignature($str = '')
     {
-        $signature = isset($_GET["msg_signature"]) ? $_GET["msg_signature"] : (isset($_GET["signature"]) ? $_GET["signature"] : '');
-        $timestamp = isset($_GET["timestamp"]) ? $_GET["timestamp"] : '';
-        $nonce = isset($_GET["nonce"]) ? $_GET["nonce"] : '';
+        $get = yield requestGet();
+        $signature = isset($get["msg_signature"]) ? $get["msg_signature"] : (isset($get["signature"]) ? $get["signature"] : '');
+        $timestamp = isset($get["timestamp"]) ? $get["timestamp"] : '';
+        $nonce = isset($get["nonce"]) ? $get["nonce"] : '';
         $tmpArr = array($this->token, $timestamp, $nonce, $str);
         sort($tmpArr, SORT_STRING);
         if (sha1(implode($tmpArr)) == $signature) {
-            return true;
+            yield true;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -169,31 +169,31 @@ class Common
             list($appid, $appsecret) = array($this->appid, $this->appsecret);
         }
         if ($token) {
-            return $this->access_token = $token;
+            yield $this->access_token = $token;
         }
         $cache = 'wechat_access_token_' . $appid;
-        if (($access_token = Tools::getCache($cache)) && !empty($access_token)) {
-            return $this->access_token = $access_token;
+        if (($access_token =yield Tools::getCache($cache)) && !empty($access_token)) {
+            yield $this->access_token = $access_token;
         }
         # 检测事件注册
         if (isset(Loader::$callback[__FUNCTION__])) {
-            return $this->access_token = call_user_func_array(Loader::$callback[__FUNCTION__], array(&$this, &$cache));
+            yield $this->access_token = call_user_func_array(Loader::$callback[__FUNCTION__], array(&$this, &$cache));
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::AUTH_URL . 'appid=' . $appid . '&secret=' . $appsecret);
+        $result =yield Tools::httpGet(self::API_URL_PREFIX . self::AUTH_URL . 'appid=' . $appid . '&secret=' . $appsecret);
         if ($result) {
             $json = json_decode($result, true);
             if (!$json || isset($json['errcode'])) {
                 $this->errCode = $json['errcode'];
                 $this->errMsg = $json['errmsg'];
-                Tools::log("Get New AccessToken Error. {$this->errMsg}[{$this->errCode}]", "ERR - {$this->appid}");
+                yield Tools::log("Get New AccessToken Error. {$this->errMsg}[{$this->errCode}] - {$this->appid}");
                 return false;
             }
             $this->access_token = $json['access_token'];
-            Tools::log("Get New AccessToken Success.", "MSG - {$this->appid}");
-            Tools::setCache($cache, $this->access_token, 5000);
-            return $this->access_token;
+            yield Tools::log("Get New AccessToken Success. - {$this->appid}");
+            yield Tools::setCache($cache, $this->access_token);
+            yield $this->access_token;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -204,15 +204,15 @@ class Common
      */
     protected function checkRetry($method, $arguments = array())
     {
-        Tools::log("Run {$method} Faild. {$this->errMsg}[{$this->errCode}]", "ERR - {$this->appid}");
+        yield Tools::log("Run {$method} Faild. {$this->errMsg}[{$this->errCode}] - {$this->appid}");
         if (!$this->_retry && in_array($this->errCode, array('40014', '40001', '41001', '42001'))) {
-            ($this->_retry = true) && $this->resetAuth();
+            ($this->_retry = true) && yield $this->resetAuth();
             $this->errCode = 40001;
             $this->errMsg = 'no access';
-            Tools::log("Retry Run {$method} ...", "MSG - {$this->appid}");
-            return call_user_func_array(array($this, $method), $arguments);
+            yield Tools::log("Retry Run {$method} ...");
+            yield call_user_func_array(array($this, $method), $arguments);
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -223,10 +223,10 @@ class Common
     public function resetAuth($appid = '')
     {
         $authname = 'wechat_access_token_' . (empty($appid) ? $this->appid : $appid);
-        Tools::log("Reset Auth And Remove Old AccessToken.", "MSG - {$this->appid}");
+        yield Tools::log("Reset Auth And Remove Old AccessToken.");
         $this->access_token = '';
-        Tools::removeCache($authname);
-        return true;
+        yield Tools::removeCache($authname);
+        yield true;
     }
 
 }

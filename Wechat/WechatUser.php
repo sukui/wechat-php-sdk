@@ -81,20 +81,20 @@ class WechatUser extends Common
      */
     public function getUserList($next_openid = '')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::USER_GET_URL . "access_token={$this->access_token}&next_openid={$next_openid}");
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::USER_GET_URL . "access_token={$this->access_token}&next_openid={$next_openid}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -105,20 +105,20 @@ class WechatUser extends Common
      */
     public function getUserInfo($openid)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::USER_INFO_URL . "access_token={$this->access_token}&openid={$openid}");
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::USER_INFO_URL . "access_token={$this->access_token}&openid={$openid}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -129,24 +129,24 @@ class WechatUser extends Common
      */
     public function getUserBatchInfo(array $openids, $lang = 'zh_CN')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('user_list' => array());
         foreach (array_unique($openids) as $openid) {
             $data['user_list'][] = array('openid' => $openid, 'lang' => $lang);
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::USER_BATCH_INFO_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::USER_BATCH_INFO_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode']) || !isset($json['user_info_list'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json['user_info_list'];
+           yield $json['user_info_list'];
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -157,21 +157,21 @@ class WechatUser extends Common
      */
     public function updateUserRemark($openid, $remark)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid' => $openid, 'remark' => $remark);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::USER_UPDATEREMARK_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::USER_UPDATEREMARK_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -180,20 +180,20 @@ class WechatUser extends Common
      */
     public function getGroup()
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::GROUP_GET_URL . "access_token={$this->access_token}");
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::GROUP_GET_URL . "access_token={$this->access_token}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -203,21 +203,21 @@ class WechatUser extends Common
      */
     public function delGroup($id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('group' => array('id' => $id));
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::GROUP_DELETE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::GROUP_DELETE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -227,21 +227,21 @@ class WechatUser extends Common
      */
     public function getUserGroup($openid)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid' => $openid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::USER_GROUP_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::USER_GROUP_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode']) || !isset($json['groupid'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json['groupid'];
+           yield $json['groupid'];
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -251,21 +251,21 @@ class WechatUser extends Common
      */
     public function createGroup($name)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('group' => array('name' => $name));
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::GROUP_CREATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::GROUP_CREATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -276,21 +276,21 @@ class WechatUser extends Common
      */
     public function updateGroup($groupid, $name)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('group' => array('id' => $groupid, 'name' => $name));
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::GROUP_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::GROUP_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -301,21 +301,21 @@ class WechatUser extends Common
      */
     public function updateGroupMembers($groupid, $openid)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid' => $openid, 'to_groupid' => $groupid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::GROUP_MEMBER_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::GROUP_MEMBER_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -326,21 +326,21 @@ class WechatUser extends Common
      */
     public function batchUpdateGroupMembers($groupid, $openid_list)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid_list' => $openid_list, 'to_groupid' => $groupid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::GROUP_MEMBER_BATCHUPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::GROUP_MEMBER_BATCHUPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -350,21 +350,21 @@ class WechatUser extends Common
      */
     public function createTags($name)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('tag' => array('name' => $name));
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::TAGS_CREATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::TAGS_CREATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -375,21 +375,21 @@ class WechatUser extends Common
      */
     public function updateTag($id, $name)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('tag' => array('id' => $id, 'name' => $name));
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::TAGS_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::TAGS_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -398,20 +398,20 @@ class WechatUser extends Common
      */
     public function getTags()
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::TAGS_GET_URL . "access_token={$this->access_token}");
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::TAGS_GET_URL . "access_token={$this->access_token}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -421,21 +421,21 @@ class WechatUser extends Common
      */
     public function delTag($id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('tag' => array('id' => $id));
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::TAGS_DELETE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::TAGS_DELETE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -446,21 +446,21 @@ class WechatUser extends Common
      */
     public function getTagUsers($tagid, $next_openid = '')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('tagid' => $tagid, 'next_openid' => $next_openid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::TAGS_GET_USER_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::TAGS_GET_USER_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -471,21 +471,21 @@ class WechatUser extends Common
      */
     public function batchAddUserTag($tagid, $openid_list)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid_list' => $openid_list, 'tagid' => $tagid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::TAGS_MEMBER_BATCHTAGGING . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::TAGS_MEMBER_BATCHTAGGING . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -496,21 +496,21 @@ class WechatUser extends Common
      */
     public function batchDeleteUserTag($tagid, $openid_list)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid_list' => $openid_list, 'tagid' => $tagid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::TAGS_MEMBER_BATCHUNTAGGING . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::TAGS_MEMBER_BATCHUNTAGGING . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -520,21 +520,21 @@ class WechatUser extends Common
      */
     public function getUserTags($openid)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid' => $openid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::TAGS_LIST . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::TAGS_LIST . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode']) || !isset($json['tagid_list'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json['tagid_list'];
+           yield $json['tagid_list'];
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -544,21 +544,21 @@ class WechatUser extends Common
      */
     public function getBacklist($begin_openid = '')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = empty($begin_openid) ? array() : array('begin_openid' => $begin_openid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::BACKLIST_GET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::BACKLIST_GET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -568,21 +568,21 @@ class WechatUser extends Common
      */
     public function addBacklist($openids)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid_list' => $openids);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::BACKLIST_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::BACKLIST_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -592,21 +592,21 @@ class WechatUser extends Common
      */
     public function delBacklist($openids)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('openid_list' => $openids);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::BACKLIST_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::BACKLIST_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
 }

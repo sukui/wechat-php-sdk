@@ -48,20 +48,20 @@ class WechatMenu extends Common
      */
     public function createMenu($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MENU_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MENU_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return true;
+           yield true;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -70,20 +70,20 @@ class WechatMenu extends Common
      */
     public function getMenu()
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::MENU_GET_URL . "access_token={$this->access_token}");
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MENU_GET_URL . "access_token={$this->access_token}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -92,20 +92,20 @@ class WechatMenu extends Common
      */
     public function deleteMenu()
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::MENU_DEL_URL . "access_token={$this->access_token}");
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MENU_DEL_URL . "access_token={$this->access_token}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return true;
+           yield true;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -116,20 +116,20 @@ class WechatMenu extends Common
      */
     public function createCondMenu($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json['menuid'];
+           yield $json['menuid'];
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -139,21 +139,21 @@ class WechatMenu extends Common
      */
     public function deleteCondMenu($menuid)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('menuid' => $menuid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return true;
+           yield true;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -163,21 +163,21 @@ class WechatMenu extends Common
      */
     public function tryCondMenu($openid)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('user_id' => $openid);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_TRY_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_TRY_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
 }

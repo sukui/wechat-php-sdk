@@ -34,58 +34,58 @@ class WechatHardware extends Common
      */
     public function deviceCompelUnbindhttps($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_COMPEL_UNBINDHTTPS . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_COMPEL_UNBINDHTTPS . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
 
     public function transmsg($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_TRANSMSG . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_TRANSMSG . "access_token={$this->access_token}", Tools::json_encode($data));
         //dump($result);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     public function getQrcode($product_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_BASE_URL_PREFIX . self::DEVICE_GETQRCODE . "access_token={$this->access_token}&product_id=$product_id");
+        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::DEVICE_GETQRCODE . "access_token={$this->access_token}&product_id=$product_id");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -95,20 +95,20 @@ class WechatHardware extends Common
      */
     public function deviceAuthorize($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_AUTHORIZE_DEVICE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_AUTHORIZE_DEVICE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -118,20 +118,20 @@ class WechatHardware extends Common
      */
     public function getDeviceQrcode($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_CREATE_QRCODE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::DEVICE_CREATE_QRCODE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -141,20 +141,20 @@ class WechatHardware extends Common
      */
     public function getDeviceStat($device_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_BASE_URL_PREFIX . self::DEVICE_GET_STAT . "access_token={$this->access_token}&device_id=$device_id");
+        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::DEVICE_GET_STAT . "access_token={$this->access_token}&device_id=$device_id");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
 }

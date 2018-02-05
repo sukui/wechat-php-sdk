@@ -12,6 +12,8 @@
 // | github开源项目：https://github.com/zoujingli/wechat-php-sdk
 // +----------------------------------------------------------------------
 
+namespace Wechat\Lib;
+
 /**
  * PKCS7算法 加解密
  * @category WechatSDK

@@ -15,6 +15,7 @@
 namespace Wechat\Lib;
 
 use CURLFile;
+use ZanPHP\HttpClient\HttpClient;
 
 /**
  * 微信接口通用类
@@ -142,41 +143,29 @@ class Tools
     /**
      * 以get方式提交请求
      * @param $url
+     * @param int $timeout
      * @return bool|mixed
      */
-    static public function httpGet($url)
+    static public function httpGet($url,$timeout=5000)
     {
-        $curl = curl_init();
-        if (stripos($url, "https") === 0) {
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-            curl_setopt($curl, CURLOPT_SSLVERSION, 1);
-        }
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        list($content, $status) = array(curl_exec($curl), curl_getinfo($curl), curl_close($curl));
-        return (intval($status["http_code"]) === 200) ? $content : false;
+        $httpClient = new HttpClient();
+        $response = yield $httpClient->get($url,[],$timeout);
+        yield (intval($response->getStatusCode()) === 200) ? $response->getBody() : false;
     }
 
     /**
      * 以post方式提交请求
      * @param string $url
      * @param array|string $data
+     * @param int $timeout
      * @return bool|mixed
      */
-    static public function httpPost($url, $data)
+    static public function httpPost($url, $data, $timeout=5000)
     {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, self::_buildPost($data));
-        list($content, $status) = array(curl_exec($curl), curl_getinfo($curl), curl_close($curl));
-        return (intval($status["http_code"]) === 200) ? $content : false;
+
+        $httpClient = new HttpClient();
+        $response = yield $httpClient->post($url,self::_buildPost($data),$timeout);
+        yield (intval($response->getStatusCode()) === 200) ? $response->getBody() : false;
     }
 
     /**
@@ -185,30 +174,22 @@ class Tools
      * @param array $data 请求的地址
      * @param string $ssl_cer 证书Cer路径 | 证书内容
      * @param string $ssl_key 证书Key路径 | 证书内容
-     * @param int $second 设置请求超时时间
+     * @param int $timeout 设置请求超时时间
      * @return bool|mixed
      */
-    static public function httpsPost($url, $data, $ssl_cer = null, $ssl_key = null, $second = 30)
+    static public function httpsPost($url, $data, $ssl_cer = null, $ssl_key = null, $timeout = 30000)
     {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_TIMEOUT, $second);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $httpClient = new HttpClient();
+        $options = [];
         if (!is_null($ssl_cer) && file_exists($ssl_cer) && is_file($ssl_cer)) {
-            curl_setopt($curl, CURLOPT_SSLCERTTYPE, 'PEM');
-            curl_setopt($curl, CURLOPT_SSLCERT, $ssl_cer);
+            $options['ssl_cert_file']    = $ssl_cer;
         }
         if (!is_null($ssl_key) && file_exists($ssl_key) && is_file($ssl_key)) {
-            curl_setopt($curl, CURLOPT_SSLKEYTYPE, 'PEM');
-            curl_setopt($curl, CURLOPT_SSLKEY, $ssl_key);
+            $options['ssl_key_file'] = $ssl_key;
         }
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, self::_buildPost($data));
-        list($content, $status) = array(curl_exec($curl), curl_getinfo($curl), curl_close($curl));
-        return (intval($status["http_code"]) === 200) ? $content : false;
+        $httpClient->set($options);
+        $response = yield $httpClient->post($url,self::_buildPost($data),$timeout);
+        yield (intval($response->getStatusCode()) === 200) ? $response->getBody() : false;
     }
 
     /**
@@ -235,60 +216,54 @@ class Tools
      */
     static public function getAddress()
     {
-        foreach (array('HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'HTTP_X_CLIENT_IP', 'HTTP_X_CLUSTER_CLIENT_IP', 'REMOTE_ADDR') as $header) {
-            if (!isset($_SERVER[$header]) || ($spoof = $_SERVER[$header]) === null) {
-                continue;
-            }
-            sscanf($spoof, '%[^,]', $spoof);
-            if (!filter_var($spoof, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                $spoof = null;
-            } else {
-                return $spoof;
-            }
+        $ip = yield getClientIp();
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            yield $ip;
+        } else {
+            yield '0.0.0.0';
         }
-        return '0.0.0.0';
     }
 
     /**
      * 设置缓存，按需重载
-     * @param string $cachename
+     * @param string $name
      * @param mixed $value
      * @param int $expired
      * @return bool
      */
-    static public function setCache($cachename, $value, $expired = 0)
+    static public function setCache($name, $value, $expired = 0)
     {
-        return Cache::set($cachename, $value, $expired);
+        yield Cache::set($name, $value, $expired);
     }
 
     /**
      * 获取缓存，按需重载
-     * @param string $cachename
+     * @param string $name
      * @return mixed
      */
-    static public function getCache($cachename)
+    static public function getCache($name)
     {
-        return Cache::get($cachename);
+        yield Cache::get($name);
     }
 
     /**
      * 清除缓存，按需重载
-     * @param string $cachename
+     * @param string $name
      * @return bool
      */
-    static public function removeCache($cachename)
+    static public function removeCache($name)
     {
-        return Cache::del($cachename);
+        yield Cache::del($name);
     }
 
     /**
      * SDK日志处理方法
      * @param string $msg 日志行内容
-     * @param string $type 日志级别
+     * @return \Generator
      */
-    static public function log($msg, $type = 'MSG')
+    static public function log($msg)
     {
-        Cache::put($type . ' - ' . $msg);
+        yield Cache::put($msg);
     }
 
 }

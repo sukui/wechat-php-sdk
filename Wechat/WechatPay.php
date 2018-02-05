@@ -123,7 +123,7 @@ class WechatPay
      */
     public function postXml($data, $url)
     {
-        return Tools::httpPost($url, $this->createXml($data));
+        yield Tools::httpPost($url, $this->createXml($data));
     }
 
     /**
@@ -134,7 +134,7 @@ class WechatPay
      */
     function postXmlSSL($data, $url)
     {
-        return Tools::httpsPost($url, $this->createXml($data), $this->ssl_cer, $this->ssl_key);
+        yield Tools::httpsPost($url, $this->createXml($data), $this->ssl_cer, $this->ssl_key);
     }
 
     /**
@@ -146,7 +146,8 @@ class WechatPay
      */
     public function getArrayResult($data, $url, $method = 'postXml')
     {
-        return Tools::xml2arr($this->$method($data, $url));
+        $result = yield $this->$method($data, $url);
+        yield Tools::xml2arr($result);
     }
 
     /**
@@ -192,14 +193,14 @@ class WechatPay
             "out_trade_no"     => $out_trade_no,
             "total_fee"        => $total_fee,
             "auth_code"        => $auth_code,
-            "spbill_create_ip" => Tools::getAddress()
+            "spbill_create_ip" => yield Tools::getAddress()
         );
         empty($goods_tag) || $data['goods_tag'] = $goods_tag;
-        $json = Tools::xml2arr($this->postXml($data, self::MCH_BASE_URL . '/pay/micropay'));
+        $json = Tools::xml2arr(yield $this->postXml($data, self::MCH_BASE_URL . '/pay/micropay'));
         if (!empty($json) && false === $this->_parseResult($json)) {
-            return false;
+            yield false;
         }
-        return $json;
+        yield $json;
     }
 
     /**
@@ -208,31 +209,32 @@ class WechatPay
      */
     public function getNotify()
     {
-        $notifyInfo = (array)simplexml_load_string(file_get_contents("php://input"), 'SimpleXMLElement', LIBXML_NOCDATA);
+        $content = yield requestContent();
+        $notifyInfo = (array)simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
         if (empty($notifyInfo)) {
-            Tools::log('Payment notification forbidden access.', "ERR - {$this->appid}");
+            yield Tools::log('Payment notification forbidden access.');
             $this->errCode = '404';
             $this->errMsg = 'Payment notification forbidden access.';
-            return false;
+            yield false;
         }
         if (empty($notifyInfo['sign'])) {
-            Tools::log('Payment notification signature is missing.' . var_export($notifyInfo, true), "ERR - {$this->appid}");
+            yield Tools::log('Payment notification signature is missing.' . var_export($notifyInfo, true));
             $this->errCode = '403';
             $this->errMsg = 'Payment notification signature is missing.';
-            return false;
+            yield false;
         }
         $data = $notifyInfo;
         unset($data['sign']);
         if ($notifyInfo['sign'] !== Tools::getPaySign($data, $this->partnerKey)) {
-            Tools::log('Payment notification signature verification failed.' . var_export($notifyInfo, true), "ERR - {$this->appid}");
+            yield Tools::log('Payment notification signature verification failed.' . var_export($notifyInfo, true));
             $this->errCode = '403';
             $this->errMsg = 'Payment signature verification failed.';
-            return false;
+            yield false;
         }
-        Tools::log('Payment notification signature verification success.' . var_export($notifyInfo, true), "MSG - {$this->appid}");
+        yield Tools::log('Payment notification signature verification success.' . var_export($notifyInfo, true));
         $this->errCode = '0';
         $this->errMsg = '';
-        return $notifyInfo;
+        yield $notifyInfo;
     }
 
 
@@ -242,14 +244,10 @@ class WechatPay
      * @param bool $isReturn 是否返回XML内容，默认不返回
      * @return string
      */
-    public function replyXml(array $data, $isReturn = false)
+    public function replyXml(array $data)
     {
         $xml = Tools::arr2xml($data);
-        if ($isReturn) {
-            return $xml;
-        }
-        ob_clean();
-        exit($xml);
+        return $xml;
     }
 
     /**
@@ -273,15 +271,15 @@ class WechatPay
             "total_fee"        => $total_fee,
             "notify_url"       => $notify_url,
             "trade_type"       => $trade_type,
-            "spbill_create_ip" => Tools::getAddress()
+            "spbill_create_ip" => yield Tools::getAddress()
         );
         empty($goods_tag) || $postdata['goods_tag'] = $goods_tag;
         empty($openid) || $postdata['openid'] = $openid;
-        $result = $this->getArrayResult($postdata, self::MCH_BASE_URL . '/pay/unifiedorder');
+        $result =yield $this->getArrayResult($postdata, self::MCH_BASE_URL . '/pay/unifiedorder');
         if (false === $this->_parseResult($result)) {
-            return false;
+            yield false;
         }
-        return in_array($trade_type, array('JSAPI', 'APP')) ? $result['prepay_id'] : ($trade_type === 'MWEB' ? $result['mweb_url'] : $result['code_url']);
+        yield in_array($trade_type, array('JSAPI', 'APP')) ? $result['prepay_id'] : ($trade_type === 'MWEB' ? $result['mweb_url'] : $result['code_url']);
     }
 
     /**
@@ -304,15 +302,15 @@ class WechatPay
             "total_fee"        => $total_fee,
             "notify_url"       => $notify_url,
             "trade_type"       => 'NATIVE',
-            "spbill_create_ip" => Tools::getAddress()
+            "spbill_create_ip" =>yield Tools::getAddress()
         );
         empty($goods_tag) || $postdata['goods_tag'] = $goods_tag;
         empty($openid) || $postdata['openid'] = $openid;
-        $result = $this->getArrayResult($postdata, self::MCH_BASE_URL . '/pay/unifiedorder');
+        $result =yield  $this->getArrayResult($postdata, self::MCH_BASE_URL . '/pay/unifiedorder');
         if (false === $this->_parseResult($result) || empty($result['prepay_id'])) {
-            return false;
+            yield false;
         }
-        return $result['prepay_id'];
+        yield $result['prepay_id'];
     }
 
     /**
@@ -360,11 +358,11 @@ class WechatPay
     public function closeOrder($out_trade_no)
     {
         $data = array('out_trade_no' => $out_trade_no);
-        $result = $this->getArrayResult($data, self::MCH_BASE_URL . '/pay/closeorder');
+        $result =yield $this->getArrayResult($data, self::MCH_BASE_URL . '/pay/closeorder');
         if (false === $this->_parseResult($result)) {
-            return false;
+            yield false;
         }
-        return ($result['return_code'] === 'SUCCESS');
+        yield ($result['return_code'] === 'SUCCESS');
     }
 
     /**
@@ -375,11 +373,11 @@ class WechatPay
     public function queryOrder($out_trade_no)
     {
         $data = array('out_trade_no' => $out_trade_no);
-        $result = $this->getArrayResult($data, self::MCH_BASE_URL . '/pay/orderquery');
+        $result =yield $this->getArrayResult($data, self::MCH_BASE_URL . '/pay/orderquery');
         if (false === $this->_parseResult($result)) {
-            return false;
+            yield false;
         }
-        return $result;
+        yield $result;
     }
 
     /**
@@ -410,11 +408,11 @@ class WechatPay
         !empty($transaction_id) && $data['transaction_id'] = $transaction_id;
         !empty($refund_account) && $data['refund_account'] = $refund_account;
         !empty($refund_desc) && $data['refund_desc'] = $refund_desc;
-        $result = $this->getArrayResult($data, self::MCH_BASE_URL . '/secapi/pay/refund', 'postXmlSSL');
+        $result =yield $this->getArrayResult($data, self::MCH_BASE_URL . '/secapi/pay/refund', 'postXmlSSL');
         if (false === $this->_parseResult($result)) {
-            return false;
+            yield false;
         }
-        return ($result['return_code'] === 'SUCCESS');
+        yield ($result['return_code'] === 'SUCCESS');
     }
 
     /**
@@ -426,11 +424,11 @@ class WechatPay
     {
         $data = array();
         $data['out_trade_no'] = $out_trade_no;
-        $result = $this->getArrayResult($data, self::MCH_BASE_URL . '/pay/refundquery');
+        $result =yield $this->getArrayResult($data, self::MCH_BASE_URL . '/pay/refundquery');
         if (false === $this->_parseResult($result)) {
-            return false;
+            yield false;
         }
-        return $result;
+        yield $result;
     }
 
     /**
@@ -444,12 +442,12 @@ class WechatPay
         $data = array();
         $data['bill_date'] = $bill_date;
         $data['bill_type'] = $bill_type;
-        $result = $this->postXml($data, self::MCH_BASE_URL . '/pay/downloadbill');
+        $result =yield $this->postXml($data, self::MCH_BASE_URL . '/pay/downloadbill');
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
-            return false;
+            yield false;
         }
-        return $json;
+        yield $json;
     }
 
     /**
@@ -478,7 +476,7 @@ class WechatPay
         $data['total_amount'] = $total_amount; //红包总金额
         $data['total_num'] = '1'; //发放人数据
         $data['wishing'] = $wishing; //红包祝福语
-        $data['client_ip'] = Tools::getAddress(); //调用接口的机器Ip地址
+        $data['client_ip'] =yield Tools::getAddress(); //调用接口的机器Ip地址
         $data['act_name'] = $act_name; //活动名称
         $data['remark'] = $remark; //备注信息
         $data['total_num'] = $total_num;
@@ -491,12 +489,12 @@ class WechatPay
         } else {
             $api = self::MCH_BASE_URL . '/mmpaymkttransfers/sendredpack';
         }
-        $result = $this->postXmlSSL($data, $api);
+        $result =yield $this->postXmlSSL($data, $api);
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
-            return false;
+            yield false;
         }
-        return $json;
+        yield $json;
     }
 
 
@@ -510,12 +508,12 @@ class WechatPay
     {
         $data['mch_billno'] = $billno;
         $data['bill_type'] = 'MCHT';
-        $result = $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/gethbinfo');
+        $result =yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/gethbinfo');
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
-            return false;
+            yield false;
         }
-        return $json;
+        yield $json;
     }
 
     /**
@@ -536,14 +534,14 @@ class WechatPay
         $data['openid'] = $openid;
         $data['amount'] = $amount;
         $data['check_name'] = 'NO_CHECK'; #不验证姓名
-        $data['spbill_create_ip'] = Tools::getAddress(); //调用接口的机器Ip地址
+        $data['spbill_create_ip'] =yield Tools::getAddress(); //调用接口的机器Ip地址
         $data['desc'] = $desc; //备注信息
-        $result = $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/promotion/transfers');
+        $result =yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/promotion/transfers');
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
-            return false;
+            yield false;
         }
-        return $json;
+        yield $json;
     }
 
     /**
@@ -557,12 +555,12 @@ class WechatPay
         $data['appid'] = $this->appid;
         $data['mch_id'] = $this->mch_id;
         $data['partner_trade_no'] = $billno;
-        $result = $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/gettransferinfo');
+        $result =yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/gettransferinfo');
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
-            return false;
+            yield false;
         }
-        return $json;
+        yield $json;
     }
 
     /**
@@ -574,18 +572,18 @@ class WechatPay
     {
         $data = array();
         $data['long_url'] = $url;
-        $result = $this->getArrayResult($data, self::MCH_BASE_URL . '/tools/shorturl');
+        $result =yield $this->getArrayResult($data, self::MCH_BASE_URL . '/tools/shorturl');
         if (!$result || $result['return_code'] !== 'SUCCESS') {
             $this->errCode = $result['return_code'];
             $this->errMsg = $result['return_msg'];
-            return false;
+            yield false;
         }
         if (isset($result['err_code']) && $result['err_code'] !== 'SUCCESS') {
             $this->errMsg = $result['err_code_des'];
             $this->errCode = $result['err_code'];
-            return false;
+            yield false;
         }
-        return $result['short_url'];
+        yield $result['short_url'];
     }
 
     /**
@@ -606,11 +604,11 @@ class WechatPay
         $data['partner_trade_no'] = $partner_trade_no;
         $data['openid'] = $openid;
         $data['op_user_id'] = empty($op_user_id) ? $this->mch_id : $op_user_id;
-        $result = $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/send_coupon');
+        $result =yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/send_coupon');
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
-            return false;
+            yield false;
         }
-        return $json;
+        yield $json;
     }
 }

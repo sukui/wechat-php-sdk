@@ -71,7 +71,7 @@ class WechatExtends extends Common
      */
     public function getQRUrl($ticket)
     {
-        return self::QRCODE_IMG_URL . urlencode($ticket);
+       yield self::QRCODE_IMG_URL . urlencode($ticket);
     }
 
     /**
@@ -81,21 +81,21 @@ class WechatExtends extends Common
      */
     public function getShortUrl($long_url)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('action' => 'long2short', 'long_url' => $long_url);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::SHORT_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::SHORT_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json['short_url'];
+           yield $json['short_url'];
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -107,8 +107,8 @@ class WechatExtends extends Common
      */
     public function getQRCode($scene_id, $type = 0, $expire = 2592000)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $type = ($type && is_string($scene_id)) ? 2 : $type;
         $data = array(
@@ -119,17 +119,17 @@ class WechatExtends extends Common
         if ($type == 1) {
             unset($data['expire_seconds']);
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::QRCODE_CREATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::QRCODE_CREATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -145,8 +145,8 @@ class WechatExtends extends Common
      */
     public function querySemantic($uid, $query, $category, $latitude = 0.00, $longitude = 0.00, $city = "", $region = "")
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array(
             'query'    => $query,
@@ -163,17 +163,17 @@ class WechatExtends extends Common
         } elseif ($region) {
             $data['region'] = $region;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SEMANTIC_API_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SEMANTIC_API_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -186,24 +186,24 @@ class WechatExtends extends Common
      */
     public function getDatacube($type, $subtype, $begin_date, $end_date = '')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         if (!isset(self::$DATACUBE_URL_ARR[$type]) || !isset(self::$DATACUBE_URL_ARR[$type][$subtype])) {
-            return false;
+           yield false;
         }
         $data = array('begin_date' => $begin_date, 'end_date' => $end_date ? $end_date : $begin_date);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::$DATACUBE_URL_ARR[$type][$subtype] . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::$DATACUBE_URL_ARR[$type][$subtype] . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return isset($json['list']) ? $json['list'] : $json;
+           yield isset($json['list']) ? $json['list'] : $json;
         }
-        return false;
+       yield false;
     }
 
 }

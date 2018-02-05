@@ -14,7 +14,7 @@
 
 namespace Wechat;
 
-use Prpcrypt;
+use Wechat\Lib\Prpcrypt;
 use Wechat\Lib\Tools;
 
 /**
@@ -50,11 +50,11 @@ class WechatReceive extends WechatMessage
     public function getRev()
     {
         if ($this->_receive) {
-            return $this;
+            yield $this;
         }
-        $postStr = !empty($this->postxml) ? $this->postxml : file_get_contents("php://input");
+        $postStr = !empty($this->postxml) ? $this->postxml : yield requestContent();
         !empty($postStr) && $this->_receive = (array)simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
-        return $this;
+        yield $this;
     }
 
     /**
@@ -727,7 +727,6 @@ class WechatReceive extends WechatMessage
         }
         $xmldata = Tools::arr2xml($msg);
         if ($this->encrypt_type == 'aes') { //如果来源消息为加密方式
-            !class_exists('Prpcrypt', false) && require __DIR__ . '/Lib/Prpcrypt.php';
             $pc = new Prpcrypt($this->encodingAesKey);
             // 如果是第三方平台，加密得使用 component_appid
             $array = $pc->encrypt($xmldata, empty($this->config['component_appid']) ? $this->appid : $this->config['component_appid']);

@@ -50,25 +50,25 @@ class WechatMedia extends Common
      */
     public function uploadMedia($data, $type)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         list($cache_file, $media_content) = ['', base64_decode($data['media'])];
         if (!empty($media_content) && ($cache_file = Cache::file($media_content))) {
             $data['media'] = "@{$cache_file}";
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOAD_URL . "access_token={$this->access_token}&type={$type}", $data);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOAD_URL . "access_token={$this->access_token}&type={$type}", $data);
         !empty($cache_file) && @unlink($cache_file);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -79,22 +79,22 @@ class WechatMedia extends Common
      */
     public function getMedia($media_id, $is_video = false)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::MEDIA_GET_URL . "access_token={$this->access_token}" . '&media_id=' . $media_id);
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MEDIA_GET_URL . "access_token={$this->access_token}" . '&media_id=' . $media_id);
         if ($result) {
             if (is_string($result)) {
                 $json = json_decode($result, true);
                 if (isset($json['errcode'])) {
                     $this->errCode = $json['errcode'];
                     $this->errMsg = $json['errmsg'];
-                    return $this->checkRetry(__FUNCTION__, func_get_args());
+                   yield $this->checkRetry(__FUNCTION__, func_get_args());
                 }
             }
-            return $result;
+           yield $result;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -105,8 +105,8 @@ class WechatMedia extends Common
      */
     public function getMediaWithHttpInfo($media_id, $is_video = false)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $url_prefix = $is_video ? str_replace('https', 'http', self::API_URL_PREFIX) : self::API_URL_PREFIX;
         $url = $url_prefix . self::MEDIA_GET_URL . "access_token={$this->access_token}" . '&media_id=' . $media_id;
@@ -122,7 +122,7 @@ class WechatMedia extends Common
         $aStatus = curl_getinfo($oCurl);
         $result = [];
         if (intval($aStatus["http_code"]) !== 200) {
-            return false;
+           yield false;
         }
         if ($sContent) {
             if (is_string($sContent)) {
@@ -130,14 +130,14 @@ class WechatMedia extends Common
                 if (isset($json['errcode'])) {
                     $this->errCode = $json['errcode'];
                     $this->errMsg = $json['errmsg'];
-                    return $this->checkRetry(__FUNCTION__, func_get_args());
+                   yield $this->checkRetry(__FUNCTION__, func_get_args());
                 }
             }
             $result['content'] = $sContent;
             $result['info'] = $aStatus;
-            return $result;
+           yield $result;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -149,25 +149,25 @@ class WechatMedia extends Common
      */
     public function uploadImg($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         list($cache_file, $media_content) = ['', base64_decode($data['media'])];
         if (!empty($media_content) && ($cache_file = Cache::file($media_content))) {
             $data['media'] = "@{$cache_file}";
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOADIMG_URL . "access_token={$this->access_token}", $data);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOADIMG_URL . "access_token={$this->access_token}", $data);
         !empty($cache_file) && @unlink($cache_file);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -183,26 +183,26 @@ class WechatMedia extends Common
      */
     public function uploadForeverMedia($data, $type, $is_video = false, $video_info = array())
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $is_video && ($data['description'] = Tools::json_encode($video_info));
         list($cache_file, $media_content) = ['', base64_decode($data['media'])];
         if (!empty($media_content) && ($cache_file = Cache::file($media_content))) {
             $data['media'] = "@{$cache_file}";
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_UPLOAD_URL . "access_token={$this->access_token}&type={$type}", $data);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_UPLOAD_URL . "access_token={$this->access_token}&type={$type}", $data);
         !empty($cache_file) && @unlink($cache_file);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -213,20 +213,20 @@ class WechatMedia extends Common
      */
     public function uploadForeverArticles($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_NEWS_UPLOAD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_NEWS_UPLOAD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -239,22 +239,22 @@ class WechatMedia extends Common
      */
     public function updateForeverArticles($media_id, $data, $index = 0)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         !isset($data['index']) && $data['index'] = $index;
         !isset($data['media_id']) && $data['media_id'] = $media_id;
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_NEWS_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_NEWS_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -266,23 +266,23 @@ class WechatMedia extends Common
      */
     public function getForeverMedia($media_id, $is_video = false)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('media_id' => $media_id);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_GET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_GET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             if (is_string($result) && ($json = json_decode($result, true))) {
                 if (isset($json['errcode'])) {
                     $this->errCode = $json['errcode'];
                     $this->errMsg = $json['errmsg'];
-                    return $this->checkRetry(__FUNCTION__, func_get_args());
+                   yield $this->checkRetry(__FUNCTION__, func_get_args());
                 }
-                return $json;
+               yield $json;
             }
-            return $result;
+           yield $result;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -292,21 +292,21 @@ class WechatMedia extends Common
      */
     public function delForeverMedia($media_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('media_id' => $media_id);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return true;
+           yield true;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -324,21 +324,21 @@ class WechatMedia extends Common
      */
     public function getForeverList($type, $offset, $count)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('type' => $type, 'offset' => $offset, 'count' => $count,);
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_BATCHGET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_BATCHGET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -354,20 +354,20 @@ class WechatMedia extends Common
      */
     public function getForeverCount()
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpGet(self::API_URL_PREFIX . self::MEDIA_FOREVER_COUNT_URL . "access_token={$this->access_token}");
+        $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MEDIA_FOREVER_COUNT_URL . "access_token={$this->access_token}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -377,20 +377,20 @@ class WechatMedia extends Common
      */
     public function uploadArticles($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOADNEWS_URL . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOADNEWS_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -410,20 +410,20 @@ class WechatMedia extends Common
      */
     public function uploadMpVideo($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_VIDEO_UPLOAD . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_VIDEO_UPLOAD . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
 }

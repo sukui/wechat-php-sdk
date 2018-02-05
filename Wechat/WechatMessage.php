@@ -32,20 +32,20 @@ class WechatMessage extends Common
      */
     public function getAllPrivateTemplate()
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/template/get_all_private_template?access_token={$this->access_token}", []);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/template/get_all_private_template?access_token={$this->access_token}", []);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -54,20 +54,20 @@ class WechatMessage extends Common
      */
     public function getTMIndustry()
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/template/get_industry?access_token={$this->access_token}", []);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/template/get_industry?access_token={$this->access_token}", []);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -77,21 +77,21 @@ class WechatMessage extends Common
      */
     public function delPrivateTemplate($tpl_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array('template_id' => $tpl_id);
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/template/del_private_template?access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/template/del_private_template?access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return true;
+           yield true;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -102,24 +102,24 @@ class WechatMessage extends Common
      */
     public function setTMIndustry($id1, $id2 = '')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = array();
         !empty($id1) && $data['industry_id1'] = $id1;
         !empty($id2) && $data['industry_id2'] = $id2;
         $json = Tools::json_encode($data);
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/template/api_set_industry?access_token={$this->access_token}", $json);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/template/api_set_industry?access_token={$this->access_token}", $json);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -130,21 +130,21 @@ class WechatMessage extends Common
      */
     public function addTemplateMessage($tpl_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = Tools::json_encode(array('template_id_short' => $tpl_id));
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/template/api_add_template?access_token={$this->access_token}", $data);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/template/api_add_template?access_token={$this->access_token}", $data);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json['template_id'];
+           yield $json['template_id'];
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -178,20 +178,20 @@ class WechatMessage extends Common
      */
     public function sendTemplateMessage($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/message/template/send?access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/message/template/send?access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -213,20 +213,20 @@ class WechatMessage extends Common
      */
     public function sendMassMessage($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/message/mass/send?access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/message/mass/send?access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -248,20 +248,20 @@ class WechatMessage extends Common
      */
     public function sendGroupMassMessage($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/message/mass/sendall?access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/message/mass/sendall?access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -271,21 +271,21 @@ class WechatMessage extends Common
      */
     public function deleteMassMessage($msg_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = Tools::json_encode(array('msg_id' => $msg_id));
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/message/mass/delete?access_token={$this->access_token}", $data);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/message/mass/delete?access_token={$this->access_token}", $data);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return true;
+           yield true;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -305,20 +305,20 @@ class WechatMessage extends Common
      */
     public function previewMassMessage($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/message/mass/preview?access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/message/mass/preview?access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
     /**
@@ -332,21 +332,21 @@ class WechatMessage extends Common
      */
     public function queryMassMessage($msg_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+           yield false;
         }
         $data = Tools::json_encode(array('msg_id' => $msg_id));
-        $result = Tools::httpPost(self::API_URL_PREFIX . "/message/mass/get?access_token={$this->access_token}", $data);
+        $result = yield Tools::httpPost(self::API_URL_PREFIX . "/message/mass/get?access_token={$this->access_token}", $data);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+               yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+           yield $json;
         }
-        return false;
+       yield false;
     }
 
 }

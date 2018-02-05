@@ -48,20 +48,20 @@ class WechatDevice extends Common
      */
     public function applyShakeAroundDevice($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_APPLYID . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_APPLYID . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -71,21 +71,21 @@ class WechatDevice extends Common
      */
     public function applyStatusShakeAroundDevice($apply_id)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         $data = array("apply_id" => $apply_id);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_APPLYSTATUS . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_APPLYSTATUS . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -95,20 +95,20 @@ class WechatDevice extends Common
      */
     public function updateShakeAroundDevice($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_UPDATE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_UPDATE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return true;
+            yield true;
         }
-        return false;
+        yield false;
     }
 
 
@@ -119,20 +119,20 @@ class WechatDevice extends Common
      */
     public function searchShakeAroundDevice($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_SEARCH . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_SEARCH . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -146,29 +146,29 @@ class WechatDevice extends Common
      */
     public function bindLocationShakeAroundDevice($device_id, $poi_id, $uuid = '', $major = 0, $minor = 0)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         if (!$device_id) {
             if (!$uuid || !$major || !$minor) {
-                return false;
+                yield false;
             }
             $device_identifier = array('uuid' => $uuid, 'major' => $major, 'minor' => $minor);
         } else {
             $device_identifier = array('device_id' => $device_id);
         }
         $data = array('device_identifier' => $device_identifier, 'poi_id' => $poi_id);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_BINDLOCATION . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_BINDLOCATION . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -180,21 +180,21 @@ class WechatDevice extends Common
      */
     public function bindLocationOtherShakeAroundDevice($device_identifier, $poi_id, $poi_appid)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         $data = array('device_identifier' => $device_identifier, 'poi_id' => $poi_id, "type" => 2, "poi_appid" => $poi_appid);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_BINDLOCATION . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_BINDLOCATION . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -210,29 +210,29 @@ class WechatDevice extends Common
      */
     public function bindPageShakeAroundDevice($device_id, $page_ids = array(), $bind = 1, $append = 1, $uuid = '', $major = 0, $minor = 0)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         if (!$device_id) {
             if (!$uuid || !$major || !$minor) {
-                return false;
+                yield false;
             }
             $device_identifier = array('uuid' => $uuid, 'major' => $major, 'minor' => $minor);
         } else {
             $device_identifier = array('device_id' => $device_id);
         }
         $data = array('device_identifier' => $device_identifier, 'page_ids' => $page_ids, 'bind' => $bind, 'append' => $append);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_BINDPAGE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_DEVICE_BINDPAGE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -243,20 +243,20 @@ class WechatDevice extends Common
      */
     public function uploadShakeAroundMedia($data)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_MATERIAL_ADD . "access_token={$this->access_token}", $data);
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_MATERIAL_ADD . "access_token={$this->access_token}", $data);
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -271,21 +271,21 @@ class WechatDevice extends Common
      */
     public function addShakeAroundPage($title, $description, $icon_url, $page_url, $comment = '')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         $data = array("title" => $title, "description" => $description, "icon_url" => $icon_url, "page_url" => $page_url, "comment" => $comment);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_ADD . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_ADD . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -301,21 +301,21 @@ class WechatDevice extends Common
      */
     public function updateShakeAroundPage($page_id, $title, $description, $icon_url, $page_url, $comment = '')
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         $data = array("page_id" => $page_id, "title" => $title, "description" => $description, "icon_url" => $icon_url, "page_url" => $page_url, "comment" => $comment);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_UPDATE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_UPDATE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -328,25 +328,25 @@ class WechatDevice extends Common
      */
     public function searchShakeAroundPage($page_ids = array(), $begin = 0, $count = 1)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         if (!empty($page_ids)) {
             $data = array('page_ids' => $page_ids);
         } else {
             $data = array('begin' => $begin, 'count' => $count);
         }
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_SEARCH . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_SEARCH . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -357,21 +357,21 @@ class WechatDevice extends Common
      */
     public function deleteShakeAroundPage($page_ids = array())
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         $data = array('page_ids' => $page_ids);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_DELETE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_PAGE_DELETE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -382,21 +382,21 @@ class WechatDevice extends Common
      */
     public function getShakeInfoShakeAroundUser($ticket)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         $data = array('ticket' => $ticket);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_USER_GETSHAKEINFO . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_USER_GETSHAKEINFO . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -412,29 +412,29 @@ class WechatDevice extends Common
      */
     public function deviceShakeAroundStatistics($device_id, $begin_date, $end_date, $uuid = '', $major = 0, $minor = 0)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         if (!$device_id) {
             if (!$uuid || !$major || !$minor) {
-                return false;
+                yield false;
             }
             $device_identifier = array('uuid' => $uuid, 'major' => $major, 'minor' => $minor);
         } else {
             $device_identifier = array('device_id' => $device_id);
         }
         $data = array('device_identifier' => $device_identifier, 'begin_date' => $begin_date, 'end_date' => $end_date);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_STATISTICS_DEVICE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_STATISTICS_DEVICE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 
@@ -447,21 +447,21 @@ class WechatDevice extends Common
      */
     public function pageShakeAroundStatistics($page_id, $begin_date, $end_date)
     {
-        if (!$this->access_token && !$this->getAccessToken()) {
-            return false;
+        if (!$this->access_token && !yield $this->getAccessToken()) {
+            yield false;
         }
         $data = array('page_id' => $page_id, 'begin_date' => $begin_date, 'end_date' => $end_date);
-        $result = Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_STATISTICS_DEVICE . "access_token={$this->access_token}", Tools::json_encode($data));
+        $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::SHAKEAROUND_STATISTICS_DEVICE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                return $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
 }

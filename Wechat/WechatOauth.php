@@ -49,23 +49,23 @@ class WechatOauth extends Common
      */
     public function getOauthAccessToken()
     {
-        $code = isset($_GET['code']) ? $_GET['code'] : '';
+        $code = yield requestGet('code');
         if (empty($code)) {
-            Tools::log("getOauthAccessToken Fail, Because there is no access to the code value in get.", "MSG - {$this->appid}");
-            return false;
+            yield Tools::log("getOauthAccessToken Fail, Because there is no access to the code value in get.");
+            yield false;
         }
-        $result = Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_TOKEN_URL . "appid={$this->appid}&secret={$this->appsecret}&code={$code}&grant_type=authorization_code");
+        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_TOKEN_URL . "appid={$this->appid}&secret={$this->appsecret}&code={$code}&grant_type=authorization_code");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                Tools::log("WechatOauth::getOauthAccessToken Fail.{$this->errMsg} [{$this->errCode}]", "ERR - {$this->appid}");
-                return false;
+                yield Tools::log("WechatOauth::getOauthAccessToken Fail.{$this->errMsg} [{$this->errCode}]");
+                yield false;
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -75,18 +75,18 @@ class WechatOauth extends Common
      */
     public function getOauthRefreshToken($refresh_token)
     {
-        $result = Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_REFRESH_URL . "appid={$this->appid}&grant_type=refresh_token&refresh_token={$refresh_token}");
+        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_REFRESH_URL . "appid={$this->appid}&grant_type=refresh_token&refresh_token={$refresh_token}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                Tools::log("WechatOauth::getOauthRefreshToken Fail.{$this->errMsg} [{$this->errCode}]", "ERR - {$this->appid}");
-                return false;
+                yield Tools::log("WechatOauth::getOauthRefreshToken Fail.{$this->errMsg} [{$this->errCode}]");
+                yield false;
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -98,18 +98,18 @@ class WechatOauth extends Common
      */
     public function getOauthUserInfo($access_token, $openid)
     {
-        $result = Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_USERINFO_URL . "access_token={$access_token}&openid={$openid}");
+        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_USERINFO_URL . "access_token={$access_token}&openid={$openid}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                Tools::log("WechatOauth::getOauthUserInfo Fail.{$this->errMsg} [{$this->errCode}]", "ERR - {$this->appid}");
-                return false;
+                yield Tools::log("WechatOauth::getOauthUserInfo Fail.{$this->errMsg} [{$this->errCode}]");
+                yield false;
             }
-            return $json;
+            yield $json;
         }
-        return false;
+        yield false;
     }
 
     /**
@@ -120,19 +120,19 @@ class WechatOauth extends Common
      */
     public function getOauthAuth($access_token, $openid)
     {
-        $result = Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_AUTH_URL . "access_token={$access_token}&openid={$openid}");
+        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_AUTH_URL . "access_token={$access_token}&openid={$openid}");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-                Tools::log("WechatOauth::getOauthAuth Fail.{$this->errMsg} [{$this->errCode}]", "ERR - {$this->appid}");
-                return false;
+                yield Tools::log("WechatOauth::getOauthAuth Fail.{$this->errMsg} [{$this->errCode}]");
+                yield false;
             } elseif (intval($json['errcode']) === 0) {
-                return true;
+                yield true;
             }
         }
-        return false;
+        yield false;
     }
 
 }
