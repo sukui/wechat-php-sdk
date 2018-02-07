@@ -51,6 +51,7 @@ class WechatReceive extends WechatMessage
     {
         if ($this->_receive) {
             yield $this;
+            return;
         }
         $postStr = !empty($this->postxml) ? $this->postxml : yield requestContent();
         !empty($postStr) && $this->_receive = (array)simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);

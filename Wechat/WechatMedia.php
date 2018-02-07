@@ -51,7 +51,8 @@ class WechatMedia extends Common
     public function uploadMedia($data, $type)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         list($cache_file, $media_content) = ['', base64_decode($data['media'])];
         if (!empty($media_content) && ($cache_file = Cache::file($media_content))) {
@@ -64,9 +65,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -80,7 +83,8 @@ class WechatMedia extends Common
     public function getMedia($media_id, $is_video = false)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MEDIA_GET_URL . "access_token={$this->access_token}" . '&media_id=' . $media_id);
         if ($result) {
@@ -89,10 +93,12 @@ class WechatMedia extends Common
                 if (isset($json['errcode'])) {
                     $this->errCode = $json['errcode'];
                     $this->errMsg = $json['errmsg'];
-                   yield $this->checkRetry(__FUNCTION__, func_get_args());
+                    yield $this->checkRetry(__FUNCTION__, func_get_args());
+                    return;
                 }
             }
-           yield $result;
+            yield $result;
+            return;
         }
        yield false;
     }
@@ -106,7 +112,8 @@ class WechatMedia extends Common
     public function getMediaWithHttpInfo($media_id, $is_video = false)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $url_prefix = $is_video ? str_replace('https', 'http', self::API_URL_PREFIX) : self::API_URL_PREFIX;
         $url = $url_prefix . self::MEDIA_GET_URL . "access_token={$this->access_token}" . '&media_id=' . $media_id;
@@ -122,7 +129,8 @@ class WechatMedia extends Common
         $aStatus = curl_getinfo($oCurl);
         $result = [];
         if (intval($aStatus["http_code"]) !== 200) {
-           yield false;
+            yield false;
+            return;
         }
         if ($sContent) {
             if (is_string($sContent)) {
@@ -130,12 +138,14 @@ class WechatMedia extends Common
                 if (isset($json['errcode'])) {
                     $this->errCode = $json['errcode'];
                     $this->errMsg = $json['errmsg'];
-                   yield $this->checkRetry(__FUNCTION__, func_get_args());
+                    yield $this->checkRetry(__FUNCTION__, func_get_args());
+                    return;
                 }
             }
             $result['content'] = $sContent;
             $result['info'] = $aStatus;
-           yield $result;
+            yield $result;
+            return;
         }
        yield false;
     }
@@ -150,10 +160,11 @@ class WechatMedia extends Common
     public function uploadImg($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         list($cache_file, $media_content) = ['', base64_decode($data['media'])];
-        if (!empty($media_content) && ($cache_file = Cache::file($media_content))) {
+        if (!empty($media_content) && ($cache_file =yield Cache::file($media_content))) {
             $data['media'] = "@{$cache_file}";
         }
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOADIMG_URL . "access_token={$this->access_token}", $data);
@@ -163,9 +174,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -184,11 +197,12 @@ class WechatMedia extends Common
     public function uploadForeverMedia($data, $type, $is_video = false, $video_info = array())
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $is_video && ($data['description'] = Tools::json_encode($video_info));
         list($cache_file, $media_content) = ['', base64_decode($data['media'])];
-        if (!empty($media_content) && ($cache_file = Cache::file($media_content))) {
+        if (!empty($media_content) && ($cache_file =yield Cache::file($media_content))) {
             $data['media'] = "@{$cache_file}";
         }
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_UPLOAD_URL . "access_token={$this->access_token}&type={$type}", $data);
@@ -198,9 +212,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -214,7 +230,8 @@ class WechatMedia extends Common
     public function uploadForeverArticles($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_NEWS_UPLOAD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -222,9 +239,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -240,7 +259,8 @@ class WechatMedia extends Common
     public function updateForeverArticles($media_id, $data, $index = 0)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         !isset($data['index']) && $data['index'] = $index;
         !isset($data['media_id']) && $data['media_id'] = $media_id;
@@ -250,9 +270,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -267,7 +289,8 @@ class WechatMedia extends Common
     public function getForeverMedia($media_id, $is_video = false)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('media_id' => $media_id);
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_GET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -276,11 +299,14 @@ class WechatMedia extends Common
                 if (isset($json['errcode'])) {
                     $this->errCode = $json['errcode'];
                     $this->errMsg = $json['errmsg'];
-                   yield $this->checkRetry(__FUNCTION__, func_get_args());
+                    yield $this->checkRetry(__FUNCTION__, func_get_args());
+                    return;
                 }
-               yield $json;
+                yield $json;
+                return;
             }
-           yield $result;
+            yield $result;
+            return;
         }
        yield false;
     }
@@ -293,7 +319,8 @@ class WechatMedia extends Common
     public function delForeverMedia($media_id)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('media_id' => $media_id);
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -302,9 +329,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield true;
+            yield true;
+            return;
         }
        yield false;
     }
@@ -325,7 +354,8 @@ class WechatMedia extends Common
     public function getForeverList($type, $offset, $count)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('type' => $type, 'offset' => $offset, 'count' => $count,);
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_FOREVER_BATCHGET_URL . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -334,9 +364,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -355,7 +387,8 @@ class WechatMedia extends Common
     public function getForeverCount()
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MEDIA_FOREVER_COUNT_URL . "access_token={$this->access_token}");
         if ($result) {
@@ -363,9 +396,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -378,7 +413,8 @@ class WechatMedia extends Common
     public function uploadArticles($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_UPLOADNEWS_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -386,9 +422,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -411,7 +449,8 @@ class WechatMedia extends Common
     public function uploadMpVideo($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MEDIA_VIDEO_UPLOAD . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -419,9 +458,11 @@ class WechatMedia extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }

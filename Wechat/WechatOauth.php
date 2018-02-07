@@ -53,6 +53,7 @@ class WechatOauth extends Common
         if (empty($code)) {
             yield Tools::log("getOauthAccessToken Fail, Because there is no access to the code value in get.");
             yield false;
+            return;
         }
         $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_TOKEN_URL . "appid={$this->appid}&secret={$this->appsecret}&code={$code}&grant_type=authorization_code");
         if ($result) {
@@ -62,10 +63,12 @@ class WechatOauth extends Common
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield Tools::log("WechatOauth::getOauthAccessToken Fail.{$this->errMsg} [{$this->errCode}]");
                 yield false;
+            } else {
+                yield $json;
             }
-            yield $json;
+        } else {
+            yield false;
         }
-        yield false;
     }
 
     /**
@@ -83,8 +86,10 @@ class WechatOauth extends Common
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield Tools::log("WechatOauth::getOauthRefreshToken Fail.{$this->errMsg} [{$this->errCode}]");
                 yield false;
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -106,8 +111,10 @@ class WechatOauth extends Common
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield Tools::log("WechatOauth::getOauthUserInfo Fail.{$this->errMsg} [{$this->errCode}]");
                 yield false;
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -128,8 +135,10 @@ class WechatOauth extends Common
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield Tools::log("WechatOauth::getOauthAuth Fail.{$this->errMsg} [{$this->errCode}]");
                 yield false;
+                return;
             } elseif (intval($json['errcode']) === 0) {
                 yield true;
+                return;
             }
         }
         yield false;

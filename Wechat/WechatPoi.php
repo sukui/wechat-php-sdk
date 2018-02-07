@@ -52,7 +52,8 @@ class WechatPoi extends Common
     public function addPoi($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::POI_ADD . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -60,11 +61,13 @@ class WechatPoi extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -76,7 +79,8 @@ class WechatPoi extends Common
     public function delPoi($poi_id)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('poi_id' => $poi_id);
         $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::POI_DELETE . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -85,11 +89,13 @@ class WechatPoi extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -101,7 +107,8 @@ class WechatPoi extends Common
     public function updatePoi($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::POI_UPDATE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -109,11 +116,13 @@ class WechatPoi extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield true;
+            yield true;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -125,7 +134,8 @@ class WechatPoi extends Common
     public function getPoi($poi_id)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('poi_id' => $poi_id);
         $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::POI_GET . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -134,11 +144,13 @@ class WechatPoi extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -151,7 +163,8 @@ class WechatPoi extends Common
     public function getPoiList($begin = 0, $limit = 50)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $limit > 50 && $limit = 50;
         $data = array('begin' => $begin, 'limit' => $limit);
@@ -161,11 +174,13 @@ class WechatPoi extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -175,7 +190,8 @@ class WechatPoi extends Common
     public function getCategory()
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpGet(self::API_URL_PREFIX . self::POI_CATEGORY . "access_token={$this->access_token}");
         if ($result) {
@@ -183,11 +199,13 @@ class WechatPoi extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
-       yield false;
+        yield false;
     }
 
 }

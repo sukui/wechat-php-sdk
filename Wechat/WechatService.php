@@ -99,6 +99,7 @@ class WechatService
             $this->errMsg = $receive->errMsg;
             yield Tools::log("Get Wechat Push ComponentVerifyTicket Faild. {$this->errMsg} [$this->errCode]");
             yield false;
+            return;
         }
         $receive = yield $receive->getRev();
         $data = $receive->getRevData();
@@ -123,6 +124,7 @@ class WechatService
         empty($this->component_access_token) && yield $this->getComponentAccessToken();
         if (empty($this->component_access_token)) {
             yield false;
+            return;
         }
         $data = array();
         $data['component_appid'] = $this->component_appid;
@@ -133,7 +135,7 @@ class WechatService
         if (($result = $this->_decode($result)) === false) {
             yield Tools::log("Get getAuthorizerOption Faild. {$this->errMsg} [$this->errCode]");
         }
-        return $result;
+        yield $result;
     }
 
     /**
@@ -195,6 +197,7 @@ class WechatService
         empty($this->component_access_token) &&yield $this->getComponentAccessToken();
         if (empty($this->component_access_token)) {
             yield false;
+            return;
         }
         $data = array();
         $data['component_appid'] = $this->component_appid;
@@ -205,6 +208,7 @@ class WechatService
         if (empty($authorization_info)) {
             yield Tools::log("Get getAuthorizationInfo Faild. {$this->errMsg} [$this->errCode]");
             yield false;
+            return;
         }
         $authorization_info['func_info'] = $this->_parseFuncInfo($authorization_info['func_info']);
         yield $authorization_info;
@@ -244,6 +248,7 @@ class WechatService
         if (empty($authorizer_info)) {
             yield Tools::log("Get WechatInfo Faild. {$this->errMsg} [$this->errCode]");
             yield false;
+            return;
         }
         $author_data = array_merge($authorizer_info, $this->data['authorization_info']);
         $author_data['service_type_info'] = $author_data['service_type_info']['id'];
@@ -264,6 +269,7 @@ class WechatService
         empty($this->component_access_token) &&yield $this->getComponentAccessToken();
         if (empty($this->authorizer_appid)) {
             yield false;
+            return;
         }
         $data = array();
         $data['component_appid'] = $this->component_appid;
@@ -289,6 +295,7 @@ class WechatService
         empty($this->component_access_token) &&yield $this->getComponentAccessToken();
         if (empty($this->authorizer_appid)) {
             yield false;
+            return;
         }
         $data = array();
         $data['component_appid'] = $this->component_appid;
@@ -313,6 +320,7 @@ class WechatService
         empty($this->pre_auth_code) &&yield $this->getPreauthCode();
         if (empty($this->pre_auth_code)) {
             yield false;
+            return;
         }
         yield "https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid={$this->component_appid}&pre_auth_code={$this->pre_auth_code}&redirect_uri={$redirect_uri}";
     }
@@ -327,6 +335,7 @@ class WechatService
         empty($this->component_access_token) &&yield $this->getComponentAccessToken();
         if (empty($this->component_access_token)) {
             yield false;
+            return;
         }
         $data = array();
         $data['component_appid'] = $this->component_appid;
@@ -362,16 +371,19 @@ class WechatService
         $code = isset($_GET['code']) ? $_GET['code'] : '';
         if (empty($code)) {
             yield false;
+            return;
         }
         empty($this->component_access_token) &&yield $this->getComponentAccessToken();
         if (empty($this->component_access_token)) {
             yield false;
+            return;
         }
         $url = "https://api.weixin.qq.com/sns/oauth2/component/access_token?appid={$appid}&code={$code}&grant_type=authorization_code&"
             . "component_appid={$this->component_appid}&component_access_token={$this->component_access_token}";
         $json = $this->parseJson(yield Tools::httpGet($url));
         if ($json !== false) {
             yield $json;
+            return;
         }
         yield false;
     }
@@ -388,6 +400,7 @@ class WechatService
             $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
             $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
             return false;
+            return;
         }
         return $json;
     }

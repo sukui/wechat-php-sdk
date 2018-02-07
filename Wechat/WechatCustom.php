@@ -44,6 +44,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result =yield yield  Tools::httpPost(self::API_URL_PREFIX . self::CUSTOM_SERVICE_GET_RECORD . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -52,8 +53,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -67,6 +70,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield  false;
+            return;
         }
         $result = yield  Tools::httpGet(self::API_URL_PREFIX . self::CUSTOM_SERVICE_GET_KFLIST . "access_token={$this->access_token}");
         if ($result) {
@@ -75,8 +79,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         return false;
     }
@@ -90,6 +96,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield  Tools::httpGet(self::API_URL_PREFIX . self::CUSTOM_SERVICE_GET_ONLINEKFLIST . "access_token={$this->access_token}");
         if ($result) {
@@ -98,8 +105,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -116,6 +125,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $data = array("openid" => $openid, "kf_account" => $kf_account);
         $text !== '' && $data["text"] = $text;
@@ -126,8 +136,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -152,6 +164,7 @@ class WechatCustom extends Common
         }
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield  Tools::httpPost(self::API_BASE_URL_PREFIX . self::CUSTOM_SESSION_CLOSE . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -160,8 +173,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -181,6 +196,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield  Tools::httpGet(self::API_BASE_URL_PREFIX . self::CUSTOM_SESSION_GET . "access_token={$this->access_token}" . '&openid=' . $openid);
         if ($result) {
@@ -189,8 +205,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -216,6 +234,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield  Tools::httpGet(self::API_BASE_URL_PREFIX . self::CUSTOM_SESSION_GET_LIST . "access_token={$this->access_token}" . '&kf_account=' . $kf_account);
         if ($result) {
@@ -224,8 +243,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -238,6 +259,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::CUSTOM_SESSION_GET_WAIT . "access_token={$this->access_token}");
         if ($result) {
@@ -246,8 +268,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -265,6 +289,7 @@ class WechatCustom extends Common
         $data = array("kf_account" => $account, "nickname" => $nickname, "password" => md5($password));
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield  Tools::httpPost(self::API_BASE_URL_PREFIX . self::CS_KF_ACCOUNT_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -273,8 +298,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -297,6 +324,7 @@ class WechatCustom extends Common
         $data = array("kf_account" => $account, "nickname" => $nickname, "password" => md5($password));
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield  Tools::httpPost(self::API_BASE_URL_PREFIX . self::CS_KF_ACCOUNT_UPDATE_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -305,8 +333,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -320,6 +350,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield  Tools::httpGet(self::API_BASE_URL_PREFIX . self::CS_KF_ACCOUNT_DEL_URL . "access_token={$this->access_token}" . '&kf_account=' . $account);
         if ($result) {
@@ -328,8 +359,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }
@@ -344,6 +377,7 @@ class WechatCustom extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
             yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::CS_KF_ACCOUNT_UPLOAD_HEADIMG_URL . "access_token={$this->access_token}&kf_account={$account}", array('media' => '@' . $imgfile));
         if ($result) {
@@ -352,8 +386,10 @@ class WechatCustom extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             yield $json;
+            return;
         }
         yield false;
     }

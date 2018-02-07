@@ -83,6 +83,7 @@ class WechatExtends extends Common
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
            yield false;
+            return;
         }
         $data = array('action' => 'long2short', 'long_url' => $long_url);
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::SHORT_URL . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -92,8 +93,10 @@ class WechatExtends extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json['short_url'];
+            yield $json['short_url'];
+            return;
         }
        yield false;
     }
@@ -108,7 +111,8 @@ class WechatExtends extends Common
     public function getQRCode($scene_id, $type = 0, $expire = 2592000)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $type = ($type && is_string($scene_id)) ? 2 : $type;
         $data = array(
@@ -125,9 +129,11 @@ class WechatExtends extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -146,7 +152,8 @@ class WechatExtends extends Common
     public function querySemantic($uid, $query, $category, $latitude = 0.00, $longitude = 0.00, $city = "", $region = "")
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array(
             'query'    => $query,
@@ -169,9 +176,11 @@ class WechatExtends extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
        yield false;
     }
@@ -187,10 +196,12 @@ class WechatExtends extends Common
     public function getDatacube($type, $subtype, $begin_date, $end_date = '')
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         if (!isset(self::$DATACUBE_URL_ARR[$type]) || !isset(self::$DATACUBE_URL_ARR[$type][$subtype])) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('begin_date' => $begin_date, 'end_date' => $end_date ? $end_date : $begin_date);
         $result = yield Tools::httpPost(self::API_BASE_URL_PREFIX . self::$DATACUBE_URL_ARR[$type][$subtype] . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -199,9 +210,11 @@ class WechatExtends extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield isset($json['list']) ? $json['list'] : $json;
+            yield isset($json['list']) ? $json['list'] : $json;
+            return;
         }
        yield false;
     }

@@ -49,7 +49,8 @@ class WechatMenu extends Common
     public function createMenu($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::MENU_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -57,11 +58,13 @@ class WechatMenu extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield true;
+            yield true;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -71,7 +74,8 @@ class WechatMenu extends Common
     public function getMenu()
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MENU_GET_URL . "access_token={$this->access_token}");
         if ($result) {
@@ -79,11 +83,13 @@ class WechatMenu extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -93,7 +99,8 @@ class WechatMenu extends Common
     public function deleteMenu()
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpGet(self::API_URL_PREFIX . self::MENU_DEL_URL . "access_token={$this->access_token}");
         if ($result) {
@@ -101,11 +108,13 @@ class WechatMenu extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield true;
+            yield true;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -117,7 +126,8 @@ class WechatMenu extends Common
     public function createCondMenu($data)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_ADD_URL . "access_token={$this->access_token}", Tools::json_encode($data));
         if ($result) {
@@ -125,11 +135,13 @@ class WechatMenu extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json['menuid'];
+            yield $json['menuid'];
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -140,7 +152,8 @@ class WechatMenu extends Common
     public function deleteCondMenu($menuid)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('menuid' => $menuid);
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_DEL_URL . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -149,11 +162,13 @@ class WechatMenu extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield true;
+            yield true;
+            return;
         }
-       yield false;
+        yield false;
     }
 
     /**
@@ -164,7 +179,8 @@ class WechatMenu extends Common
     public function tryCondMenu($openid)
     {
         if (!$this->access_token && !yield $this->getAccessToken()) {
-           yield false;
+            yield false;
+            return;
         }
         $data = array('user_id' => $openid);
         $result = yield Tools::httpPost(self::API_URL_PREFIX . self::COND_MENU_TRY_URL . "access_token={$this->access_token}", Tools::json_encode($data));
@@ -173,11 +189,13 @@ class WechatMenu extends Common
             if (empty($json) || !empty($json['errcode'])) {
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
-               yield $this->checkRetry(__FUNCTION__, func_get_args());
+                yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
-           yield $json;
+            yield $json;
+            return;
         }
-       yield false;
+        yield false;
     }
 
 }

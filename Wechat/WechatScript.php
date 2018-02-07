@@ -57,6 +57,7 @@ class WechatScript extends Common
         if (empty($access_token)) {
             if (!$this->access_token && !yield $this->getAccessToken()) {
                 yield false;
+                return;
             }
             $access_token = $this->access_token;
         }
@@ -67,16 +68,19 @@ class WechatScript extends Common
         if ($jsapi_ticket) {
             $this->jsapi_ticket = $jsapi_ticket;
             yield $this->jsapi_ticket;
+            return;
         }
         # 尝试从缓存中读取
         $cache = 'wechat_jsapi_ticket_' . $appid;
         $jt =yield Tools::getCache($cache);
         if ($jt) {
-            return $this->jsapi_ticket = $jt;
+            yield $this->jsapi_ticket = $jt;
+            return;
         }
         # 检测事件注册
         if (isset(Loader::$callback[__FUNCTION__])) {
-            return $this->jsapi_ticket = call_user_func_array(Loader::$callback[__FUNCTION__], array(&$this, &$cache));
+            yield $this->jsapi_ticket = call_user_func_array(Loader::$callback[__FUNCTION__], array(&$this, &$cache));
+            return;
         }
         # 调接口获取
         $result =yield Tools::httpGet(self::API_URL_PREFIX . self::GET_TICKET_URL . "access_token={$access_token}" . '&type=jsapi');
@@ -86,6 +90,7 @@ class WechatScript extends Common
                 $this->errCode = isset($json['errcode']) ? $json['errcode'] : '505';
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield $this->checkRetry(__FUNCTION__, func_get_args());
+                return;
             }
             $this->jsapi_ticket = $json['ticket'];
             yield Tools::setCache($cache, $this->jsapi_ticket, $json['expires_in'] ? intval($json['expires_in']) - 100 : 3600);
@@ -107,6 +112,7 @@ class WechatScript extends Common
     {
         if (!$this->jsapi_ticket && !yield $this->getJsTicket($appid, '', $access_token) || empty($url)) {
             yield false;
+            return;
         }
         $data = array(
             "jsapi_ticket" => $this->jsapi_ticket,
