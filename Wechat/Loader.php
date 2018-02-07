@@ -97,12 +97,7 @@ class Loader
     static public function config($config = array())
     {
         !empty($config) && self::$config = array_merge(self::$config, $config);
-        if (!empty(self::$config['cachepath'])) {
-            Cache::$cachepath = self::$config['cachepath'];
-        }
-        if (empty(self::$config['component_verify_ticket'])) {
-            self::$config['component_verify_ticket'] = Cache::get('component_verify_ticket');
-        }
+
         if (empty(self::$config['token']) && !empty(self::$config['component_token'])) {
             self::$config['token'] = self::$config['component_token'];
         }

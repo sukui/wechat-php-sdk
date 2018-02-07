@@ -76,7 +76,7 @@ class WechatCard extends Common
             yield $jsapi_ticket;
         }
         $authname = 'wechat_jsapi_ticket_wxcard_' . $appid;
-        if (($jsapi_ticket = Tools::getCache($authname))) {
+        if (($jsapi_ticket =yield Tools::getCache($authname))) {
             yield $jsapi_ticket;
         }
         $result = yield Tools::httpGet(self::API_URL_PREFIX . self::GET_TICKET_URL . "access_token={$this->access_token}&type=wx_card");

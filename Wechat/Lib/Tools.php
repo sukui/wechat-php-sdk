@@ -177,12 +177,12 @@ class Tools
      * @param int $timeout 设置请求超时时间
      * @return bool|mixed
      */
-    static public function httpsPost($url, $data, $ssl_cer = null, $ssl_key = null, $timeout = 30000)
+    static public function httpsPost($url, $data, $ssl_cert = null, $ssl_key = null, $timeout = 30000)
     {
         $httpClient = new HttpClient();
         $options = [];
-        if (!is_null($ssl_cer) && file_exists($ssl_cer) && is_file($ssl_cer)) {
-            $options['ssl_cert_file']    = $ssl_cer;
+        if (!is_null($ssl_cert) && file_exists($ssl_cert) && is_file($ssl_cert)) {
+            $options['ssl_cert_file']    = $ssl_cert;
         }
         if (!is_null($ssl_key) && file_exists($ssl_key) && is_file($ssl_key)) {
             $options['ssl_key_file'] = $ssl_key;

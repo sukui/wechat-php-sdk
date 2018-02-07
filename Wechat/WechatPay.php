@@ -40,7 +40,7 @@ class WechatPay
     public $partnerKey;
 
     /** 证书路径 */
-    public $ssl_cer;
+    public $ssl_cert;
     public $ssl_key;
 
     /** 执行错误消息及代码 */
@@ -57,7 +57,7 @@ class WechatPay
         $this->appid = isset($this->config['appid']) ? $this->config['appid'] : '';
         $this->mch_id = isset($this->config['mch_id']) ? $this->config['mch_id'] : '';
         $this->partnerKey = isset($this->config['partnerkey']) ? $this->config['partnerkey'] : '';
-        $this->ssl_cer = isset($this->config['ssl_cer']) ? $this->config['ssl_cer'] : '';
+        $this->ssl_cert = isset($this->config['ssl_cert']) ? $this->config['ssl_cert'] : '';
         $this->ssl_key = isset($this->config['ssl_key']) ? $this->config['ssl_key'] : '';
     }
 
@@ -134,7 +134,7 @@ class WechatPay
      */
     function postXmlSSL($data, $url)
     {
-        yield Tools::httpsPost($url, $this->createXml($data), $this->ssl_cer, $this->ssl_key);
+        yield Tools::httpsPost($url, $this->createXml($data), $this->ssl_cert, $this->ssl_key);
     }
 
     /**
