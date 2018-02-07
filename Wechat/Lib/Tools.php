@@ -149,7 +149,7 @@ class Tools
     static public function httpGet($url,$timeout=5000)
     {
         $httpClient = new HttpClient();
-        $response = yield $httpClient->get($url,[],$timeout);
+        $response = yield $httpClient->getByURL($url,[],$timeout);
         yield (intval($response->getStatusCode()) === 200) ? $response->getBody() : false;
     }
 
@@ -164,7 +164,7 @@ class Tools
     {
 
         $httpClient = new HttpClient();
-        $response = yield $httpClient->post($url,self::_buildPost($data),$timeout);
+        $response = yield $httpClient->postByURL($url,self::_buildPost($data),$timeout);
         yield (intval($response->getStatusCode()) === 200) ? $response->getBody() : false;
     }
 
@@ -188,7 +188,7 @@ class Tools
             $options['ssl_key_file'] = $ssl_key;
         }
         $httpClient->set($options);
-        $response = yield $httpClient->post($url,self::_buildPost($data),$timeout);
+        $response = yield $httpClient->postByURL($url,self::_buildPost($data),$timeout);
         yield (intval($response->getStatusCode()) === 200) ? $response->getBody() : false;
     }
 
