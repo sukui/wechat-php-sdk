@@ -103,7 +103,7 @@ class WechatOauth extends Common
      */
     public function getOauthUserInfo($access_token, $openid)
     {
-        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_USERINFO_URL . "access_token={$access_token}&openid={$openid}");
+        $result = yield Tools::httpGet(self::API_BASE_URL_PREFIX . self::OAUTH_USERINFO_URL . "access_token={$access_token}&openid={$openid}&lang=zh_CN");
         if ($result) {
             $json = json_decode($result, true);
             if (empty($json) || !empty($json['errcode'])) {
