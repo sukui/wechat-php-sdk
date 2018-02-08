@@ -46,7 +46,8 @@ class Cache
     static public function set($name, $value, $expired = 0)
     {
         if (isset(Loader::$callback['CacheSet'])) {
-            return call_user_func_array(Loader::$callback['CacheSet'], func_get_args());
+            yield call_user_func_array(Loader::$callback['CacheSet'], func_get_args());
+            return;
         }
         yield RedisCache::set('weixin.common.default',$name,$value);
     }
@@ -59,7 +60,8 @@ class Cache
     static public function get($name)
     {
         if (isset(Loader::$callback['CacheGet'])) {
-            return call_user_func_array(Loader::$callback['CacheGet'], func_get_args());
+            yield call_user_func_array(Loader::$callback['CacheGet'], func_get_args());
+            return;
         }
         yield RedisCache::get('weixin.common.default',$name);
     }
@@ -72,7 +74,8 @@ class Cache
     static public function del($name)
     {
         if (isset(Loader::$callback['CacheDel'])) {
-            return call_user_func_array(Loader::$callback['CacheDel'], func_get_args());
+            yield call_user_func_array(Loader::$callback['CacheDel'], func_get_args());
+            return;
         }
         yield RedisCache::del('weixin.common.default',$name);
     }
@@ -85,7 +88,8 @@ class Cache
     static public function put($message)
     {
         if (isset(Loader::$callback['CachePut'])) {
-            return call_user_func_array(Loader::$callback['CachePut'], func_get_args());
+            yield call_user_func_array(Loader::$callback['CachePut'], func_get_args());
+            return;
         }
         yield Log::make('debug')->info($message);
     }
@@ -100,16 +104,19 @@ class Cache
     {
         if (isset(Loader::$callback['CacheFile'])) {
             return call_user_func_array(Loader::$callback['CacheFile'], func_get_args());
+            return;
         }
         empty($filename) && $filename = md5($content) . '.' . self::getFileExt($content);
         $path = APP_PATH."/upload/";
         if (!is_dir($path) && !mkdir($path, 0755, true)) {
-            return false;
+            yield false;
+            return;
         }
         $fileWriter = new OnceFile();
         $ret = yield $fileWriter->putContents($path.$filename,$content);
         if ($ret) {
             yield $path . $filename;
+            return;
         }
         yield false;
     }

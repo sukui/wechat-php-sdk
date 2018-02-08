@@ -117,6 +117,7 @@ class Common
                     $this->errMsg = $array[1];
                     yield Tools::log("Interface Authentication Failed. {$this->errMsg}[{$this->errCode}]-{$this->appid}");
                     yield false;
+                    return;
                 }
                 $this->postxml = $array[1];
                 empty($this->appid) && $this->appid = $array[2];
@@ -126,6 +127,7 @@ class Common
         } elseif (isset($_GET["echostr"])) {
             if (yield $this->checkSignature()) {
                 yield true;
+                return;
             }
             yield false;
         }
@@ -133,6 +135,7 @@ class Common
         if (!$ret) {
             $this->errMsg = 'Interface authentication failed, please use the correct method to call.';
             yield false;
+            return;
         }
         yield true;
     }
@@ -152,6 +155,7 @@ class Common
         sort($tmpArr, SORT_STRING);
         if (sha1(implode($tmpArr)) == $signature) {
             yield true;
+            return;
         }
         yield false;
     }
@@ -170,14 +174,17 @@ class Common
         }
         if ($token) {
             yield $this->access_token = $token;
+            return;
         }
         $cache = 'wechat_access_token_' . $appid;
         if (($access_token =yield Tools::getCache($cache)) && !empty($access_token)) {
             yield $this->access_token = $access_token;
+            return;
         }
         # 检测事件注册
         if (isset(Loader::$callback[__FUNCTION__])) {
             yield $this->access_token = call_user_func_array(Loader::$callback[__FUNCTION__], array(&$this, &$cache));
+            return;
         }
         $result =yield Tools::httpGet(self::API_URL_PREFIX . self::AUTH_URL . 'appid=' . $appid . '&secret=' . $appsecret);
         if ($result) {
@@ -192,6 +199,7 @@ class Common
             yield Tools::log("Get New AccessToken Success. - {$this->appid}");
             yield Tools::setCache($cache, $this->access_token);
             yield $this->access_token;
+            return;
         }
         yield false;
     }
@@ -211,6 +219,7 @@ class Common
             $this->errMsg = 'no access';
             yield Tools::log("Retry Run {$method} ...");
             yield call_user_func_array(array($this, $method), $arguments);
+            return;
         }
         yield false;
     }
