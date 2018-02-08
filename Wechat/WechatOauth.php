@@ -63,8 +63,10 @@ class WechatOauth extends Common
                 $this->errMsg = isset($json['errmsg']) ? $json['errmsg'] : '无法解析接口返回内容！';
                 yield Tools::log("WechatOauth::getOauthAccessToken Fail.{$this->errMsg} [{$this->errCode}]");
                 yield false;
+                return;
             } else {
                 yield $json;
+                return;
             }
         } else {
             yield false;
