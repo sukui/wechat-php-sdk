@@ -245,7 +245,6 @@ class WechatPay
     /**
      * 支付XML统一回复
      * @param array $data 需要回复的XML内容数组
-     * @param bool $isReturn 是否返回XML内容，默认不返回
      * @return string
      */
     public function replyXml(array $data)
