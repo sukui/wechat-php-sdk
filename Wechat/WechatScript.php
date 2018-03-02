@@ -74,7 +74,8 @@ class WechatScript extends Common
         $cache = 'wechat_jsapi_ticket_' . $appid;
         $jt =yield Tools::getCache($cache);
         if ($jt) {
-            yield $this->jsapi_ticket = $jt;
+            $this->jsapi_ticket = $jt;
+            yield $this->jsapi_ticket;
             return;
         }
         # 检测事件注册
@@ -95,6 +96,7 @@ class WechatScript extends Common
             $this->jsapi_ticket = $json['ticket'];
             yield Tools::setCache($cache, $this->jsapi_ticket, $json['expires_in'] ? intval($json['expires_in']) - 100 : 3600);
             yield $this->jsapi_ticket;
+            return;
         }
         yield false;
     }
@@ -110,7 +112,7 @@ class WechatScript extends Common
      */
     public function getJsSign($url, $timestamp = 0, $noncestr = '', $appid = '', $access_token = '')
     {
-        if (!$this->jsapi_ticket && !yield $this->getJsTicket($appid, '', $access_token) || empty($url)) {
+        if (!$this->jsapi_ticket && empty(yield $this->getJsTicket($appid, '', $access_token)) || empty($url)) {
             yield false;
             return;
         }
