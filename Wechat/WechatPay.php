@@ -538,7 +538,7 @@ class WechatPay
      * @return array|bool
      * @link https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_2
      */
-    public function transfers($openid, $amount, $billno, $desc, $real_name=null)
+    public function transfers($openid, $amount, $billno, $desc, $real_name=false)
     {
         $data = array();
         $data['mchid'] = $this->mch_id;
@@ -549,7 +549,7 @@ class WechatPay
 
         $data['spbill_create_ip'] = yield Tools::getAddress(); //调用接口的机器Ip地址
         $data['desc'] = $desc; //备注信息
-        if($real_name === null){
+        if($real_name === false){
             $data['check_name'] = 'NO_CHECK'; //不验证姓名
         }else{
             $data['check_name'] = 'FORCE_CHECK'; //强制校验真实姓名
