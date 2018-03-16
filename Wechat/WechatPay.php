@@ -534,10 +534,11 @@ class WechatPay
      * @param int $amount 红包总金额
      * @param string $billno 商户订单号
      * @param string $desc 备注信息
-     * @return bool|array
+     * @param null $real_name
+     * @return array|bool
      * @link https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_2
      */
-    public function transfers($openid, $amount, $billno, $desc)
+    public function transfers($openid, $amount, $billno, $desc, $real_name=null)
     {
         $data = array();
         $data['mchid'] = $this->mch_id;
@@ -545,9 +546,15 @@ class WechatPay
         $data['partner_trade_no'] = $billno;
         $data['openid'] = $openid;
         $data['amount'] = $amount;
-        $data['check_name'] = 'NO_CHECK'; #不验证姓名
+
         $data['spbill_create_ip'] = yield Tools::getAddress(); //调用接口的机器Ip地址
         $data['desc'] = $desc; //备注信息
+        if($real_name === null){
+            $data['check_name'] = 'NO_CHECK'; //不验证姓名
+        }else{
+            $data['check_name'] = 'FORCE_CHECK'; //强制校验真实姓名
+            $data['re_user_name'] = $real_name;
+        }
         $result = yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/promotion/transfers');
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
