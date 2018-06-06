@@ -420,7 +420,7 @@ class WechatPay
             yield false;
             return;
         }
-        yield ($result['return_code'] === 'SUCCESS');
+        yield $result;
     }
 
     /**
