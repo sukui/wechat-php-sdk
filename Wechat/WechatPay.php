@@ -389,9 +389,9 @@ class WechatPay
 
     /**
      * 订单退款接口
-     * @param string $out_trade_no 商户订单号
-     * @param string $transaction_id 微信订单号，与 out_refund_no 二选一（不选时传0或false）
-     * @param string $out_refund_no 商户退款订单号，与 transaction_id 二选一（不选时传0或false）
+     * @param string $out_trade_no 商户订单号，与 transaction_id 二选一（不选时传0或false）
+     * @param string $transaction_id 微信订单号，与 out_trade_no 二选一（不选时传0或false）
+     * @param string $out_refund_no 商户退款订单号
      * @param int $total_fee 商户订单总金额
      * @param int $refund_fee 退款金额，不可大于订单总金额
      * @param int|null $op_user_id 操作员ID，默认商户ID
