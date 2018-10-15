@@ -266,4 +266,15 @@ class Tools
         yield Cache::put($msg);
     }
 
+    /**
+     * 银行卡相关加密
+     * @param $str
+     * @param $public_key
+     * @return string
+     */
+    static public function getBankSign($str,$public_key){
+        openssl_sign($str, $sign, $public_key, OPENSSL_PKCS1_OAEP_PADDING);
+        return base64_encode($sign);
+    }
+
 }

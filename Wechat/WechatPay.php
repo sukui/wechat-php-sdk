@@ -585,6 +585,73 @@ class WechatPay
     }
 
     /**
+     * 获取银行加密RSA公钥
+     * @return \Generator|void
+     */
+    public function getBankPublicKey(){
+        $data['appid'] = $this->appid;
+        $data['mch_id'] = $this->mch_id;
+        $result = yield $this->postXmlSSL($data, 'https://fraud.mch.weixin.qq.com/risk/getpublickey');
+        $json = Tools::xml2arr($result);
+        if (!empty($json) && false === $this->_parseResult($json)) {
+            yield false;
+            return;
+        }
+        yield $json;
+    }
+
+    /**
+     * @param $bill_no
+     * @param $amount
+     * @param $bank_no
+     * @param $real_name
+     * @param $bank_code
+     * @param $desc
+     * @return \Generator|void
+     */
+    public function transferToBank($bill_no,$amount,$bank_no,$real_name,$bank_code,$desc=''){
+        $data = array();
+        $data['mchid'] = $this->mch_id;
+        $data['mch_appid'] = $this->appid;
+        $data['partner_trade_no'] = $bill_no;
+        $data['enc_bank_no'] = Tools::getBankSign($bank_no,$this->config['bank_public_key']);
+        $data['enc_true_name'] = Tools::getBankSign($real_name,$this->config['bank_public_key']);
+        $data['bank_code'] = $bank_code;
+        $data['amount'] = $amount;
+        $data['desc'] = $desc; //备注信息
+
+        $result = yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaysptrans/pay_bank');
+        $json = Tools::xml2arr($result);
+        if (!empty($json) && false === $this->_parseResult($json)) {
+            yield false;
+            return;
+        }
+        yield $json;
+    }
+
+    /**
+     * 企业付款银行卡查询
+     * @param string $bill_no
+     * @return bool|array
+     * @link https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_3
+     */
+    public function queryTransferBank($bill_no)
+    {
+        $data['appid'] = $this->appid;
+        $data['mch_id'] = $this->mch_id;
+        $data['partner_trade_no'] = $bill_no;
+        $result = yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaymkttransfers/query_bank');
+        $json = Tools::xml2arr($result);
+        if (!empty($json) && false === $this->_parseResult($json)) {
+            yield false;
+            return;
+        }
+        yield $json;
+    }
+
+
+
+    /**
      * 二维码链接转成短链接
      * @param string $url 需要处理的长链接
      * @return bool|string
