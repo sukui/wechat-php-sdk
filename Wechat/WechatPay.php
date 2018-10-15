@@ -593,8 +593,8 @@ class WechatPay
     public function getBankPublicKey(){
         $data['mch_id'] = $this->mch_id;
         $data['nonce_str'] = Tools::createNoncestr();
-        $data["sign"] = Tools::getPaySign($data, $this->partnerKey);
         $data["sign_type"] = 'MD5';
+        $data["sign"] = Tools::getPaySign($data, $this->partnerKey);
         $str =  Tools::arr2xml($data);
         $result = yield $this->postXmlSSL($str, 'https://fraud.mch.weixin.qq.com/risk/getpublickey',true);
         $json = Tools::xml2arr($result);
