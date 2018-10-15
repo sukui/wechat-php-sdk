@@ -616,16 +616,17 @@ class WechatPay
      */
     public function transferToBank($bill_no,$amount,$bank_no,$real_name,$bank_code,$desc=''){
         $data = array();
-        $data['mchid'] = $this->mch_id;
-        $data['mch_appid'] = $this->appid;
+        $data['mch_id'] = $this->mch_id;
         $data['partner_trade_no'] = $bill_no;
         $data['enc_bank_no'] = Tools::getBankSign($bank_no,$this->config['bank_public_key']);
         $data['enc_true_name'] = Tools::getBankSign($real_name,$this->config['bank_public_key']);
         $data['bank_code'] = $bank_code;
         $data['amount'] = $amount;
         $data['desc'] = $desc; //备注信息
-
-        $result = yield $this->postXmlSSL($data, self::MCH_BASE_URL . '/mmpaysptrans/pay_bank');
+        $data['nonce_str'] = Tools::createNoncestr();
+        $data["sign"] = Tools::getPaySign($data, $this->partnerKey);
+        $str =  Tools::arr2xml($data);
+        $result = yield $this->postXmlSSL($str, self::MCH_BASE_URL . '/mmpaysptrans/pay_bank',true);
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
             yield false;

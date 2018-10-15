@@ -273,7 +273,7 @@ class Tools
      * @return string
      */
     static public function getBankSign($str,$public_key){
-        openssl_sign($str, $sign, $public_key, OPENSSL_PKCS1_OAEP_PADDING);
+        openssl_public_encrypt($str, $sign, $public_key, OPENSSL_PKCS1_OAEP_PADDING);
         return base64_encode($sign);
     }
 
