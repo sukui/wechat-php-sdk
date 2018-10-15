@@ -119,22 +119,24 @@ class WechatPay
      * POST提交XML
      * @param array $data
      * @param string $url
+     * @param bool $raw
      * @return mixed
      */
-    public function postXml($data, $url)
+    public function postXml($data, $url, $raw=false)
     {
-        yield Tools::httpPost($url, $this->createXml($data));
+        yield Tools::httpPost($url, $raw?$data:$this->createXml($data));
     }
 
     /**
      * 使用证书post请求XML
-     * @param array $data
+     * @param array|string $data
      * @param string $url
+     * @param bool $raw
      * @return mixed
      */
-    function postXmlSSL($data, $url)
+    function postXmlSSL($data, $url, $raw=false)
     {
-        yield Tools::httpsPost($url, $this->createXml($data), $this->ssl_cert, $this->ssl_key);
+        yield Tools::httpsPost($url, $raw?$data:$this->createXml($data), $this->ssl_cert, $this->ssl_key);
     }
 
     /**
@@ -589,9 +591,12 @@ class WechatPay
      * @return \Generator|void
      */
     public function getBankPublicKey(){
-        $data['appid'] = $this->appid;
         $data['mch_id'] = $this->mch_id;
-        $result = yield $this->postXmlSSL($data, 'https://fraud.mch.weixin.qq.com/risk/getpublickey');
+        $data['nonce_str'] = Tools::createNoncestr();
+        $data["sign"] = Tools::getPaySign($data, $this->partnerKey);
+        $data["sign_type"] = 'MD5';
+        $str =  Tools::arr2xml($data);
+        $result = yield $this->postXmlSSL($str, 'https://fraud.mch.weixin.qq.com/risk/getpublickey',true);
         $json = Tools::xml2arr($result);
         if (!empty($json) && false === $this->_parseResult($json)) {
             yield false;
